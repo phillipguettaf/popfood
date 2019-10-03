@@ -141,24 +141,6 @@ app.post('/getCommentSentiment', function(req,res) {
 
 });
 
-app.get('/getAccessToken', function(res) {
-	
-	var r = fetch(url, {
-		method: 'GET'
-	}).then(response => {
-		console.log(response);
-		return response.json();
-	}).catch(err => {
-		console.error(err);
-	});
-	var accessToken = r.access_token;
-
-	console.log(access_token);
-
-	res.json(access_token);
-
-});
-
 // Listen on server port
 app.listen(serverPort);
 console.log(`[Server] API Server running on port: ${serverPort}.`);
