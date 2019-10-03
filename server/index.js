@@ -1,13 +1,13 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const fs = require("fs");
 const mysql = require('mysql');
 const cors = require("cors");
 const fetch = require("node-fetch");
 const zApiKey = 'd436351503c1a24f2215626e78067a16';
 const gApiKey = "AIzaSyAjDXZHujgWXP2CP27sTJ3uy1J1BrFzEW4";
 
+const {google} = require('googleapis');
 // Port for the API server
 const serverPort = 8080;
 
@@ -109,19 +109,53 @@ app.post("/getZomatoRestaurantReviews", function(req, res) {
 })
 
 app.post('/getCommentSentiment', function(req,res) {
-	var postDoc = {
-		"type": PLAIN_TEXT,
-		"language": "en",
-		"content": req.body.text
+	if (req.body.text) {
+		var contentText = req.body.text;
+	} else {
+		var contentText = "a";
 	}
 
 	var postData = {
-		"document": postDoc,
-		"encodingType": UTF16
+		"document": {
+			"type": "PLAIN_TEXT",
+			"language": "en",
+			"content": contentText
+		},
+		"encodingType": "UTF16"
 	};
 
-	var url = "https://language.googleapis.com/v1beta2/documents:analyzeSentiment";
+	
+	var url = 'https://language.googleapis.com/v1/documents:analyzeSentiment?fields=documentSentiment&key=' + gApiKey;
 
+	fetch(url, {
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(postData)
+	}).then(response => {
+		return response.json();
+	}).then(data => {
+		res.json(data);
+	}).catch(err => {
+		console.error(err);
+	});
+
+});
+
+app.get('/getAccessToken', function(res) {
+	
+	var r = fetch(url, {
+		method: 'GET'
+	}).then(response => {
+		console.log(response);
+		return response.json();
+	}).catch(err => {
+		console.error(err);
+	});
+	var accessToken = r.access_token;
+
+	console.log(access_token);
+
+	res.json(access_token);
 
 });
 

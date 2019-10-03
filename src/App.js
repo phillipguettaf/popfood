@@ -74,18 +74,27 @@ class App extends Component {
 	}
 
 	addRestaurant(data) {
-		var zRest = data.requestData.zRest;
+		var zomatoRestaurant = data.requestData.zRest;
 		var zReviews = data.data.user_reviews;
-
-		var zomatoRestaurant = {zRest, zReviews};
 		var googleRestaurant = data.requestData.gRest;
 
-		var restaurant = {zomatoRestaurant, googleRestaurant};
+		var reviewsArray = googleRestaurant.reviews.concat(zReviews);
+
+		var restaurant = {zomatoRestaurant, googleRestaurant, reviewsArray};
 
 		this.setState({
 			restaurants: [...this.state.restaurants, restaurant]
 		});
-		console.log(this.state.restaurants);
+
+		for (var review of restaurant.reviewsArray) {
+			var reviewForSentimentAnalysis;
+			if (review.text) {
+				reviewForSentimentAnalysis = { text: review.text };
+			} else {
+				reviewForSentimentAnalysis = { text: review.review_text };
+			}
+			apiPOST('getCommentSentiment', reviewForSentimentAnalysis, (data) => console.log(data));
+		}
 	}
 
 
