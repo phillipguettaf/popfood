@@ -13,10 +13,12 @@ class App extends Component {
 				lat: null,
 				lng: null,
 			},
-			restaurants: []
+			restaurants: [],
+			sentiments: []
 		};
 
-		this.printZRestaurants = this.printZRestaurants.bind(this);
+		this.addSentiments = this.addSentiments.bind(this);
+		this.zomatoCallback = this.zomatoCallback.bind(this);
 		this.getfromPosition = this.getfromPosition.bind(this);
 		this.addRestaurant = this.addRestaurant.bind(this);
 		this.getZomatoRestaurants = this.getZomatoRestaurants.bind(this);
@@ -27,7 +29,7 @@ class App extends Component {
 	} 
 
 	componentDidMount() {
-		console.log("mount");
+		
 	}
 
 	getfromPosition() {
@@ -44,10 +46,9 @@ class App extends Component {
 
 			this.getZomatoRestaurants();
 		},
-		(error) => console.log(error.message),
+		(error) => console.error(error.message),
 		{ enableHighAccuracy: false, timeout: 200000, maximumAge: 1000},
 		);
-		console.log("Got Position: " + this.state.position.lat, + ", " + this.state.position.lng);
 	}
 
 
@@ -57,7 +58,7 @@ class App extends Component {
 			latitude: this.state.position.lat,
 			longitude: this.state.position.lng
 		}
-	  	apiPOST('getZomatoRestaurants', vZData, this.printZRestaurants);
+	  	apiPOST('getZomatoRestaurants', vZData, this.zomatoCallback);
 		} else {
 		console.log("No position");
 		}
@@ -78,27 +79,45 @@ class App extends Component {
 		var zReviews = data.data.user_reviews;
 		var googleRestaurant = data.requestData.gRest;
 
+
 		var reviewsArray = googleRestaurant.reviews.concat(zReviews);
 
 		var restaurant = {zomatoRestaurant, googleRestaurant, reviewsArray};
+		
+		var reviewForSentimentAnalysis = {
+			text: ""
+		};
+
+		for (var review of reviewsArray) {
+			
+			if (review.text) {
+				reviewForSentimentAnalysis = { text: reviewForSentimentAnalysis.text + ". " + review.text };
+			} else {
+				reviewForSentimentAnalysis = { text: reviewForSentimentAnalysis.text + ". " + review.review_text };
+			}
+		}
+
+		console.log(reviewForSentimentAnalysis);
+
+		apiPOST('getCommentSentiment', reviewForSentimentAnalysis, (data) => this.addSentiments(data, restaurant));
+	}
+
+	addSentiments(data, restaurant) {
+		var reviews = restaurant.reviewsArray;
+		var googleInfo = restaurant.googleRestaurant;
+		var zomatoInfo = restaurant.zomatoRestaurant;
+		var sentiment = data.documentSentiment;
+
+		var newRestaurant = {googleInfo, zomatoInfo, reviews, sentiment};
 
 		this.setState({
-			restaurants: [...this.state.restaurants, restaurant]
+			restaurants: [...this.state.restaurants, newRestaurant]
 		});
-
-		for (var review of restaurant.reviewsArray) {
-			var reviewForSentimentAnalysis;
-			if (review.text) {
-				reviewForSentimentAnalysis = { text: review.text };
-			} else {
-				reviewForSentimentAnalysis = { text: review.review_text };
-			}
-			apiPOST('getCommentSentiment', reviewForSentimentAnalysis, (data) => console.log(data));
-		}
+		console.log(this.state.restaurants);
 	}
 
 
-	printZRestaurants(data) {
+	zomatoCallback(data) {
 		this.setState({
 			zomatoResults: data
 		});
