@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import GoogleMap from './GoogleMap.js';
-import { apiGET, apiPOST } from './api';
+import { apiPOST } from './api';
 import {BrowserRouter as Router} from 'react-router-dom';
+import SideDrawer from './SideDrawer.js';
 
 class App extends Component {
 
@@ -13,8 +14,7 @@ class App extends Component {
 				lat: null,
 				lng: null,
 			},
-			restaurants: [],
-			sentiments: []
+			restaurants: []
 		};
 
 		this.addSentiments = this.addSentiments.bind(this);
@@ -23,13 +23,12 @@ class App extends Component {
 		this.addRestaurant = this.addRestaurant.bind(this);
 		this.getZomatoRestaurants = this.getZomatoRestaurants.bind(this);
 		this.getZomatoRestaurantReviews = this.getZomatoRestaurantReviews.bind(this);
+		this.calculateAverage = this.calculateAverage.bind(this);
 		
 		this.getfromPosition();
-
 	} 
 
 	componentDidMount() {
-		
 	}
 
 	getfromPosition() {
@@ -51,7 +50,6 @@ class App extends Component {
 		);
 	}
 
-
 	getZomatoRestaurants() {
 		if (this.state.position.lat && this.state.position.lng) {
 		const vZData = {
@@ -61,6 +59,23 @@ class App extends Component {
 	  	apiPOST('getZomatoRestaurants', vZData, this.zomatoCallback);
 		} else {
 		console.log("No position");
+		}
+	}
+
+	zomatoCallback(data) {
+		var restaurant;
+
+		for (restaurant of data.nearby_restaurants) {
+			var restaurantData = {
+				latitude: restaurant.restaurant.location.latitude,
+				longitude: restaurant.restaurant.location.longitude,
+				name: restaurant.restaurant.name,
+				restaurant: restaurant.restaurant
+			};
+			apiPOST('googleRestaurants', restaurantData, (data) => {
+				this.getZomatoRestaurantReviews(data.data, data.requestBody);
+			});
+			
 		}
 	}
 
@@ -92,7 +107,7 @@ class App extends Component {
 			
 			if (review.text) {
 				reviewForSentimentAnalysis = { text: reviewForSentimentAnalysis.text + ". " + review.text };
-			} else {
+			} else if (review.review_text) {
 				reviewForSentimentAnalysis = { text: reviewForSentimentAnalysis.text + ". " + review.review_text };
 			}
 		}
@@ -109,58 +124,51 @@ class App extends Component {
 		var sentiment = data.documentSentiment;
 
 		var newRestaurant = {googleInfo, zomatoInfo, reviews, sentiment};
+		var averageRating = this.calculateAverage(newRestaurant);
+
+		var newRestaurantWithRating = {googleInfo, zomatoInfo, reviews, sentiment, averageRating};
+
 
 		this.setState({
-			restaurants: [...this.state.restaurants, newRestaurant]
+			restaurants: [...this.state.restaurants, newRestaurantWithRating]
 		});
 		console.log(this.state.restaurants);
 	}
 
-
-	zomatoCallback(data) {
-		this.setState({
-			zomatoResults: data
-		});
-
-		var restaurant;
-
-		for (restaurant of this.state.zomatoResults.nearby_restaurants) {
-			var restaurantData = {
-				latitude: restaurant.restaurant.location.latitude,
-				longitude: restaurant.restaurant.location.longitude,
-				name: restaurant.restaurant.name,
-				restaurant: restaurant.restaurant
-			};
-			apiPOST('googleRestaurants', restaurantData, (data) => {
-				this.getZomatoRestaurantReviews(data.data, data.requestBody);
-			});
-			
-		}
-	}
-
 	calculateAverage(restaurant) {
-		var googleRating = restaurant.googleRestaurant.rating;
-		var zomatoRating = restaurant.zomatoRestaurant.restaurant.user_rating.aggregate_rating;
-		var averageRating = (googleRating + zomatoRating) / 2;
+		var googleRating = restaurant.googleInfo.rating;
+		var zomatoRating = parseFloat(restaurant.zomatoInfo.user_rating.aggregate_rating);
+		var sentimentRating = ((restaurant.sentiment.score + 1) / 2) * 5;
 
+		var averageRating = (googleRating + zomatoRating + sentimentRating) / 3;
 
-
+		return averageRating;
 	}
 
 	componentWillUnmount() {
 		navigator.geolocation.clearWatch(this.watchId);
 	}
 
-
+	compareRestaurants(restA, restB) {
+		var aRating = restA.averageRating;
+		var bRating = restB.averageRating;
+		if (aRating < bRating) {
+			return 1;
+		} else if (aRating > bRating) {
+			return -1;
+		}
+		return 0;
+	}
 
 	render() {
 		return (
 			<div className="App">
 				<Router>
+					<SideDrawer nearbyrest={this.state.restaurants.sort(this.compareRestaurants)}>
+					</SideDrawer>
 					<GoogleMap 
 						position={this.state.position} 
-						zomatoRestaurants={this.state.zomatoResults} 
-						googleRestaurants={this.state.googleRestaurants}
+						restaurants={this.state.restaurants}
 					/>
 				</Router>
 			</div>

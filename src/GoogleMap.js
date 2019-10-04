@@ -1,28 +1,17 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+import './Map.css';
 
 class GoogleMap extends Component {
 
-	displayZomatoRestaurants = () => {
-		if (this.props.zomatoRestaurants) {
-			return this.props.zomatoRestaurants.nearby_restaurants.map((rest, index) => {
-				return <Marker key={index*2+1} id={index*2+1} position={{
-					lat: rest.restaurant.location.latitude,
-					lng: rest.restaurant.location.longitude
+	displayRestaurants = () => {
+		if (this.props.restaurants) {
+			return this.props.restaurants.map((rest, index) => {
+				return <Marker key={index} id={index} position={{
+					lat: rest.zomatoInfo.location.latitude,
+					lng: rest.zomatoInfo.location.longitude
 				}}
-				onClick={() => console.log("You clicked " + rest.restaurant.name + ": from Zomato.")} />
-			});
-		}
-	}
-
-	displayGoogleRestaurants = () => {
-		if (this.props.googleRestaurants) {
-			return this.props.googleRestaurants.map((rest, index) => {
-				return <Marker key={index*2} id={index*2} position={{
-					lat: rest.geometry.location.lat,
-					lng: rest.geometry.location.lng
-				}}
-				onClick={()=> console.log("You clicked " + rest.name + ": from Google.")} />
+				onClick={() => console.log("You clicked " + rest.zomatoInfo.name)} />
 			});
 		}
 	}
@@ -30,15 +19,15 @@ class GoogleMap extends Component {
 	render() {
 
 		return (
-			<Map
+			<Map 
+				className="map"
 				google={this.props.google}
 				zoom={17}
 				initialCenter = {this.props.position}
 				center = {this.props.position}
+
 			>
-				{this.displayZomatoRestaurants()}
-				{this.displayGoogleRestaurants()}
-				
+				{this.displayRestaurants()}
 			</Map>
 		);
 	}

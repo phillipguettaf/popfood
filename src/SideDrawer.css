@@ -1,0 +1,10 @@
+.drawer {
+	display: 'flex';
+	width: 30%;
+}
+
+.drawerPaper {
+	width: 30%;
+	background: #333333;
+	background: rgb(51,51,51);
+}
