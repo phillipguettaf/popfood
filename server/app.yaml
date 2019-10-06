@@ -1,7 +1,0 @@
-runtime: nodejs
-env: flex
-service: api
-
-network:
-  forwarded_ports:
-    - 443:8001/tcp
