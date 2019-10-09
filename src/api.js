@@ -17,7 +17,7 @@ function apiPOST(action, data, callback) {
     // URL Of the API server, needs to be changed on deployment
     //fetch('http://localhost:8080/' + action, {
     console.log("sending: " + action + " to api server (https://popfood-api.ap-southeast-2.elasticbeanstalk.com")
-    fetch('https://13.237.46.144443/' + action, {
+    fetch('https://13.237.46.144:443/' + action, {
         method: 'POST',
         body: JSON.stringify(data, null, 2), // Prettify the JSON output
         headers: {'Content-Type': 'application/json'}
