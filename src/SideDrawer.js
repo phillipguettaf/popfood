@@ -14,7 +14,7 @@ class SideDrawer extends Component {
 		
 			return(
 				this.props.nearbyrest.map((rest, index) => 
-					<ListItem button onClick=this.recentreAt(rest) key={rest.zomatoInfo.id}>
+					<ListItem button onClick={this.recentreAt(rest)} key={rest.zomatoInfo.id}>
 						<ListItemText
 							primary={rest.googleInfo.name}
 							secondary={rest.averageRating}
