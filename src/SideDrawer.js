@@ -19,7 +19,7 @@ class SideDrawer extends Component {
 							primary={rest.googleInfo.name}
 							secondary={rest.averageRating}
 						/>
-						<Button>
+						</Button>
 					</ListItem>
 				)
 			)
