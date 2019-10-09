@@ -73,7 +73,7 @@ class App extends Component {
 			};
 			apiPOST('googleRestaurants', restaurantData, (data) => {
 				console.log(data);
-				this.getZomatoRestaurantReviews(data.data, data.requestBody);
+				this.getZomatoRestaurantReviews(data.respData, data.requestBody);
 			});
 			
 		}
