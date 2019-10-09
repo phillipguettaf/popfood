@@ -7,14 +7,13 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Button from '@material-ui/core/Button';
 
 class SideDrawer extends Component {
-
 	
 	displayNearbyRestaurants = () => {
 		if (this.props.nearbyrest) {
 		
 			return(
 				this.props.nearbyrest.map((rest, index) => 
-					<ListItem button onClick={this.recentreAt(rest)} key={rest.zomatoInfo.id}>
+					<ListItem button onClick={() => this.props.recentreAt(rest)} key={rest.zomatoInfo.id}>
 						<ListItemText
 							primary={rest.googleInfo.name}
 							secondary={rest.averageRating}
@@ -23,10 +22,6 @@ class SideDrawer extends Component {
 				)
 			)
 		}
-	}
-
-	recentreAt = (rest) => {
-		this.props.recentreAt(rest);
 	}
 
 	render() {	
