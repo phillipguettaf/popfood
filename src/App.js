@@ -24,6 +24,7 @@ class App extends Component {
 		this.getZomatoRestaurants = this.getZomatoRestaurants.bind(this);
 		this.getZomatoRestaurantReviews = this.getZomatoRestaurantReviews.bind(this);
 		this.calculateAverage = this.calculateAverage.bind(this);
+		this.recentreAt = this.recentreAt.bind(this);
 		
 		this.getfromPosition();
 	} 
@@ -164,12 +165,23 @@ class App extends Component {
 		return 0;
 	}
 
+	recentreAt(rest) {
+		this.setState({
+			centre: {
+				lat: rest.zomatoInfo.location.latitude,
+				lng: rest.zomatoInfo.location.longitude
+			}
+		});
+	}
+
 	render() {
 		return (
 			<div className="App">
 				<Router>
-					<SideDrawer nearbyrest={this.state.restaurants.sort(this.compareRestaurants)}>
-					</SideDrawer>
+					<SideDrawer 
+						recentreAt={this.recentreAt}
+						nearbyrest={this.state.restaurants.sort(this.compareRestaurants)}
+					/>
 					<GoogleMap 
 						position={this.state.centre} 
 						restaurants={this.state.restaurants}

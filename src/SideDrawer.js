@@ -14,7 +14,7 @@ class SideDrawer extends Component {
 		
 			return(
 				this.props.nearbyrest.map((rest, index) => 
-					<ListItem button key={rest.zomatoInfo.id}>
+					<ListItem button onClick=this.recentreAt(rest) key={rest.zomatoInfo.id}>
 						<ListItemText
 							primary={rest.googleInfo.name}
 							secondary={rest.averageRating}
@@ -25,10 +25,8 @@ class SideDrawer extends Component {
 		}
 	}
 
-	displayPopularRestaurants = () => {
-		return({
-
-		});
+	recentreAt = (rest) => {
+		this.props.recentreAt(rest);
 	}
 
 	render() {	
