@@ -64,9 +64,6 @@ class App extends Component {
 
 	zomatoCallback(data) {
 		var restaurant;
-
-		console.log(data);
-
 		for (restaurant of data.nearby_restaurants) {
 			var restaurantData = {
 				latitude: restaurant.restaurant.location.latitude,
@@ -75,6 +72,7 @@ class App extends Component {
 				restaurant: restaurant.restaurant
 			};
 			apiPOST('googleRestaurants', restaurantData, (data) => {
+				console.log(data.data);
 				this.getZomatoRestaurantReviews(data.data, data.requestBody);
 			});
 			
