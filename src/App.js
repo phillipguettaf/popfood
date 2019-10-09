@@ -65,6 +65,8 @@ class App extends Component {
 	zomatoCallback(data) {
 		var restaurant;
 
+		console.log(data);
+
 		for (restaurant of data.nearby_restaurants) {
 			var restaurantData = {
 				latitude: restaurant.restaurant.location.latitude,
