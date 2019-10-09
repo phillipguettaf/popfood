@@ -14,10 +14,12 @@ class SideDrawer extends Component {
 			return(
 				this.props.nearbyrest.map((rest, index) => 
 					<ListItem key = {rest.zomatoInfo.id}>
+						<Button>
 						<ListItemText
 							primary={rest.googleInfo.name}
 							secondary={rest.averageRating}
 						/>
+						<Button>
 					</ListItem>
 				)
 			)

@@ -40,6 +40,10 @@ class App extends Component {
 					lat: position.coords.latitude,
 					lng: position.coords.longitude
 				},
+				centre: {
+					lat: position.coords.latitude,
+					lng: position.coords.latitude
+				},
 				error: null,
 			});
 
@@ -167,7 +171,7 @@ class App extends Component {
 					<SideDrawer nearbyrest={this.state.restaurants.sort(this.compareRestaurants)}>
 					</SideDrawer>
 					<GoogleMap 
-						position={this.state.position} 
+						position={this.state.centre} 
 						restaurants={this.state.restaurants}
 					/>
 				</Router>
