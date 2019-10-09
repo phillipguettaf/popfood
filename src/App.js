@@ -52,11 +52,11 @@ class App extends Component {
 
 	getZomatoRestaurants() {
 		if (this.state.position.lat && this.state.position.lng) {
-		const vZData = {
-			latitude: this.state.position.lat,
-			longitude: this.state.position.lng
-		}
-	  	apiPOST('getZomatoRestaurants', vZData, this.zomatoCallback);
+			const vZData = {
+				latitude: this.state.position.lat,
+				longitude: this.state.position.lng
+			}
+		  	apiPOST('getZomatoRestaurants', vZData, this.zomatoCallback);
 		} else {
 		console.log("No position");
 		}
