@@ -4,16 +4,21 @@ import "./SideDrawer.css"
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Button from '@material-ui/core/Button';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Divider from '@material-ui/core/Divider';
 
 class SideDrawer extends Component {
-	
-	displayNearbyRestaurants = () => {
-		if (this.props.nearbyrest) {
+
+	displayRestaurants = (restaurants) => {
+		if (restaurants) {
 		
 			return(
-				this.props.nearbyrest.map((rest, index) => 
-					<ListItem button onClick={() => this.props.recentreAt(rest)} key={rest.zomatoInfo.id}>
+				restaurants.map((rest, index) => 
+					<ListItem 
+						button onClick={() => this.clickRestaurant(rest, index)} 
+						key={rest.zomatoInfo.id}
+						selected={this.props.selectedRest.zomatoInfo.id===rest.zomatoInfo.id} 
+					>
 						<ListItemText
 							primary={rest.googleInfo.name}
 							secondary={rest.averageRating}
@@ -22,6 +27,10 @@ class SideDrawer extends Component {
 				)
 			)
 		}
+	}
+
+	clickRestaurant = (rest)  => {
+		this.props.clickRestaurant(rest)
 	}
 
 	render() {	
@@ -34,14 +43,22 @@ class SideDrawer extends Component {
 				variant="permanent"
 				anchor="left"
 			>
-				<List>
-				<ListItem>
-				<ListItemText
-					primary="Nearby Popular Restaurants"
-				/>
-				</ListItem>
-					{this.displayNearbyRestaurants()}
+				<List
+					subheader={<ListSubheader style={{"backgroundColor":"white"}}>
+						Nearby Popular Restaurants<Divider />
+					</ListSubheader>}
+				>	
+					{this.displayRestaurants(this.props.nearbyrest)}
 				</List>
+				<Divider />
+				<List
+					subheader={<ListSubheader style={{"backgroundColor":"white"}}>
+						All Time Popular Restaurants<Divider />
+					</ListSubheader>}
+				>	
+					{this.displayRestaurants(this.props.popularRestaurants)}
+				</List>
+
 			</Drawer>
 		);
 	}

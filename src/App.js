@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import GoogleMap from './GoogleMap.js';
-import { apiPOST } from './api';
+import { apiPOST, apiGET } from './api';
 import {BrowserRouter as Router} from 'react-router-dom';
 import SideDrawer from './SideDrawer.js';
 
@@ -15,7 +15,16 @@ class App extends Component {
 				lng: null,
 			},
 			restaurants: [],
-			popularRestaurants: []
+			popularRestaurants: [],
+			showingInfoWindow: false,
+			activeMarker: {},
+			selectedPlace: {
+				googleInfo: {name: ""}, 
+				zomatoInfo: {
+					id: "", 
+					location: {address: ""}
+				}
+			}
 		};
 
 		this.addSentiments = this.addSentiments.bind(this);
@@ -26,7 +35,8 @@ class App extends Component {
 		this.getZomatoRestaurantReviews = this.getZomatoRestaurantReviews.bind(this);
 		this.calculateAverage = this.calculateAverage.bind(this);
 		this.recentreAt = this.recentreAt.bind(this);
-		
+		this.getCloudRestaurants = this.getCloudRestaurants.bind(this);
+
 		this.getfromPosition();
 	} 
 
@@ -176,10 +186,7 @@ class App extends Component {
 
 	recentreAt(rest) {
 		this.setState({
-			centre: {
-				lat: rest.zomatoInfo.location.latitude,
-				lng: rest.zomatoInfo.location.longitude
-			}
+			
 		});
 	}
 
@@ -188,7 +195,46 @@ class App extends Component {
 
 		apiGET('getDynamoRestaurants', (data) => {
 			console.log(this.state.popularRestaurants);
-			this.setState({popularRestaurants: data});
+			var restaurant;
+			var restArray = []
+			console.log(data);
+			for (restaurant of data) {
+				var info = JSON.parse(restaurant.info);
+				restArray.push(info);
+			}
+			this.setState({popularRestaurants: restArray});
+		});
+	}
+
+	selectRestaurant = (props, marker, e) => {
+		var newPosition = {
+				lat: props.rest.zomatoInfo.location.latitude,
+				lng: props.rest.zomatoInfo.location.longitude
+			};
+		this.setState({
+			selectedPlace: props.rest,
+			activeMarker: marker,
+			showingInfoWindow: true,
+			centre: newPosition
+		});
+		console.log(this.state.activeMarker);
+	}
+
+	clickRestaurantList = (rest) => {
+		var newPosition = {
+				lat: rest.zomatoInfo.location.latitude,
+				lng: rest.zomatoInfo.location.longitude
+			};
+		this.setState({
+			selectedPlace: rest,
+			centre: newPosition,
+		});
+	}
+
+	onMapClicked = (props) => {
+		this.setState({
+			showingInfoWindow: false,
+			activeMarker: null,
 		});
 	}
 
@@ -197,14 +243,20 @@ class App extends Component {
 			<div className="App">
 				<Router>
 					<SideDrawer 
-						recentreAt={this.recentreAt}
+						clickRestaurant={this.clickRestaurantList}
 						nearbyrest={this.state.restaurants.sort(this.compareRestaurants)}
 						popularRestaurants={this.state.popularRestaurants}
+						selectedRest={this.state.selectedPlace}
 					/>
 					<GoogleMap 
 						position={this.state.centre} 
 						restaurants={this.state.restaurants}
 						popularRestaurants = {this.state.popularRestaurants}
+						selectRestaurant={this.selectRestaurant}
+						activeMarker={this.state.activeMarker}
+						showingInfoWindow={this.state.showingInfoWindow}
+						selectedPlace={this.state.selectedPlace}
+						onMapClicked={this.onMapClicked}
 					/>
 				</Router>
 			</div>

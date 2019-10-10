@@ -1,9 +1,11 @@
 function apiGET(action, callback) {
     // URL Of the API server, needs to be changed on deployment
     //fetch('http://localhost:8080/' + action, {
+    const apiKey = "7XYW7gkNuN1yLVR7lDBAd2QNos27OQfIaYLllYiC";
+
     fetch('https://3zwbp6vz98.execute-api.ap-southeast-2.amazonaws.com/charlie/' + action, {
         method: 'GET',
-        headers: {'Content-Type': 'application/json'}
+        headers: {'Content-Type': 'application/json', 'x-api-key': apiKey}
     }).then(response => {
         return response.json();
     }).then(data => {
