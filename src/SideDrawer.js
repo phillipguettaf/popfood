@@ -13,11 +13,10 @@ class SideDrawer extends Component {
 		
 			return(
 				this.props.nearbyrest.map((rest, index) => 
-					 var aveRate =  +(Math.round(rest.averageRating + "e+2")  + "e-2");
 					<ListItem button onClick={() => this.props.recentreAt(rest)} key={rest.zomatoInfo.id}>
 						<ListItemText
 							primary={rest.googleInfo.name}
-							secondary={aveRate}
+							secondary={rest.averageRating}
 						/>
 					</ListItem>
 				)

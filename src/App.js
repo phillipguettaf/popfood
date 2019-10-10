@@ -146,7 +146,7 @@ class App extends Component {
 		var sentimentRating = ((restaurant.sentiment.score + 1) / 2) * 5;
 
 		var averageRating = (googleRating + zomatoRating + sentimentRating) / 3;
-
+		averageRating = +(Math.round(averageRating + "e+2")  + "e-2");
 		return averageRating;
 	}
 
