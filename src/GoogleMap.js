@@ -46,6 +46,7 @@ class GoogleMap extends Component {
 				center = {this.props.position}
 				onClick={this.onMapClicked}
 			>
+				
 				{this.displayRestaurants()}
 				<InfoWindow
 					marker={this.props.activeMarker}
