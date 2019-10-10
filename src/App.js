@@ -14,7 +14,8 @@ class App extends Component {
 				lat: null,
 				lng: null,
 			},
-			restaurants: []
+			restaurants: [],
+			popularRestaurants: []
 		};
 
 		this.addSentiments = this.addSentiments.bind(this);
@@ -49,6 +50,7 @@ class App extends Component {
 			});
 
 			this.getZomatoRestaurants();
+			this.getCloudRestaurants();
 		},
 		(error) => console.error(error.message),
 		{ enableHighAccuracy: false, timeout: 200000, maximumAge: 1000},
@@ -80,7 +82,6 @@ class App extends Component {
 				console.log(data);
 				this.getZomatoRestaurantReviews(data.respData, data.requestBody);
 			});
-			
 		}
 	}
 
@@ -137,7 +138,15 @@ class App extends Component {
 		this.setState({
 			restaurants: [...this.state.restaurants, newRestaurantWithRating]
 		});
-		console.log(this.state.restaurants);
+
+		var cloudRest = {
+			zomatoID: newRestaurantWithRating.zomatoInfo.id,
+			aveRating: newRestaurantWithRating.averageRating,
+			info: newRestaurantWithRating
+		};
+
+		apiPOST('saveRest', cloudRest, (data) => {console.log("Saved restaurant " + cloudRest.info.googleInfo.name + "to cloud")});
+
 	}
 
 	calculateAverage(restaurant) {
@@ -174,6 +183,15 @@ class App extends Component {
 		});
 	}
 
+	getCloudRestaurants() {
+		console.log("Getting popular restaurants from cloud:");
+
+		apiGET('getDynamoRestaurants', (data) => {
+			console.log(this.state.popularRestaurants);
+			this.setState({popularRestaurants: data});
+		});
+	}
+
 	render() {
 		return (
 			<div className="App">
@@ -181,10 +199,12 @@ class App extends Component {
 					<SideDrawer 
 						recentreAt={this.recentreAt}
 						nearbyrest={this.state.restaurants.sort(this.compareRestaurants)}
+						popularRestaurants={this.state.popularRestaurants}
 					/>
 					<GoogleMap 
 						position={this.state.centre} 
 						restaurants={this.state.restaurants}
+						popularRestaurants = {this.state.popularRestaurants}
 					/>
 				</Router>
 			</div>

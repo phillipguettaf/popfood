@@ -1,7 +1,7 @@
 function apiGET(action, callback) {
     // URL Of the API server, needs to be changed on deployment
     //fetch('http://localhost:8080/' + action, {
-    fetch('https://popfood-api.ap-southeast-2.elasticbeanstalk.com:80/' + action, {
+    fetch('https://3zwbp6vz98.execute-api.ap-southeast-2.amazonaws.com/charlie/' + action, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}
     }).then(response => {
